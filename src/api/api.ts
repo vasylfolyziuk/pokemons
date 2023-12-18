@@ -24,3 +24,8 @@ export const getPokemon = async (id: number): Promise<Pokemon> => {
   const res = await instance.get(`pokemon/${id}`)
   return res.data
 }
+
+export const getPokemonsByName = async (name: string): Promise<Pokemon> => {
+  const res = await instance.get(`pokemon/${name}`)
+  return res.data
+}

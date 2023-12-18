@@ -1,59 +1,71 @@
-import { useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import queryString from "query-string"
+import { useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import { useAppSelector, useAppDispatch } from "@hooks/hooks"
 import {
   fetchPokemons,
   selectPokemons,
   selectFilter,
   selectLoading,
+  fetchPokemonsByName,
+  selectSearchError,
+  selectSortedPokemons,
 } from "@features/pokemons/pokemonsSlice"
-import { Pagination } from "@mui/material"
-import { PokemonsList } from "./PokemonsList"
-
-export type QueryParamsType = {
-  page?: string
-}
+import { PokemonsList } from "@features/pokemons/PokemonsList"
+import { Filter } from "@features/pokemons/Filter"
+import { ErrorBanner } from "./ErrorBanner"
 
 const OFFSET = 0
 const LIMIT = 12
 const PAGE = 1
 
 export const Pokemons = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams({
+    page: `${PAGE}`,
+    search: "",
+  })
   const dispatch = useAppDispatch()
-  const pokemons = useAppSelector(selectPokemons)
+  const pokemons = useAppSelector(selectSortedPokemons)
   const filter = useAppSelector(selectFilter)
   const isLoading = useAppSelector(selectLoading)
-
-  const [page, setPage] = useState<number>(0)
+  const searchError = useAppSelector(selectSearchError)
 
   useEffect(() => {
-    const parsed: QueryParamsType = queryString.parse(location.search)
-    let page = Number(parsed.page) > 0 ? Number(parsed.page) : PAGE
-    let offset = OFFSET
+    const pageQueryParam = Number(searchParams.get("page"))
+    const searchQueryParam = searchParams.get("search")
 
-    if (page > PAGE) {
-      offset = (page - 1) * LIMIT
+    if (searchQueryParam?.trim()) {
+      dispatch(fetchPokemonsByName(searchQueryParam))
+    } else {
+      let page = pageQueryParam > 0 ? pageQueryParam : PAGE
+      let offset = OFFSET
+
+      if (page > PAGE) {
+        offset = (page - 1) * LIMIT
+      }
+
+      dispatch(fetchPokemons({ offset, limit: LIMIT }))
     }
+  }, [dispatch, searchParams])
 
-    setPage(page)
-    dispatch(fetchPokemons({ offset, limit: LIMIT }))
-  }, [dispatch, location])
+  const onChangeSearch = (value: string) => {
+    const search = value.trim()
+    setSearchParams(search.length ? { search: value } : undefined)
+  }
 
   const onChangePage = (e: React.ChangeEvent<unknown>, page: number) => {
-    navigate(`?page=${page}`)
+    setSearchParams({ page: `${page}` })
   }
 
   return (
     <>
+      <ErrorBanner />
+      <Filter search={filter.search} onChangeSearch={onChangeSearch} />
       <PokemonsList
         pokemons={pokemons}
-        page={page}
+        page={Number(searchParams.get("page"))}
         isLoading={isLoading}
-        count={filter.count}
-        limit={LIMIT}
+        pages={Math.ceil(filter.count / LIMIT)}
+        searchError={searchError}
         onChangePage={onChangePage}
       />
     </>

@@ -6,13 +6,13 @@ type Props = {
   pokemons: Array<Pokemon>
   page: number
   isLoading: boolean
-  count: number
-  limit: number
+  pages: number
+  searchError: string | null
   onChangePage: (e: React.ChangeEvent<unknown>, page: number) => void
 }
 
 export const PokemonsList = (props: Props) => {
-  const { pokemons, page, isLoading, count, limit, onChangePage } = props
+  const { pokemons, page, isLoading, pages, searchError, onChangePage } = props
 
   return (
     <>
@@ -22,17 +22,26 @@ export const PokemonsList = (props: Props) => {
         <>
           {pokemons.map((pokemon) => (
             <PokemonsListItem
-              key={pokemon.name}
+              key={pokemon.id}
+              id={pokemon.id}
               name={pokemon.name}
-              type={pokemon.types[0].type.name}
+              type={
+                pokemon.types[0].type.name +
+                " " +
+                (pokemon.types[1]?.type.name || "")
+              }
             />
           ))}
-          <Pagination
-            page={page}
-            disabled={isLoading}
-            count={Math.ceil(count / limit)}
-            onChange={onChangePage}
-          />
+          {pages > 0 ? (
+            <Pagination
+              page={page}
+              disabled={isLoading}
+              count={pages}
+              onChange={onChangePage}
+            />
+          ) : (
+            <div>{searchError || "No pokemons"}</div>
+          )}
         </>
       )}
     </>
