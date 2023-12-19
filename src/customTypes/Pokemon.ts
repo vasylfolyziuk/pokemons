@@ -1,8 +1,3 @@
-export interface PokemonListItem {
-  name: string
-  url: string
-}
-
 export interface Pokemon {
   abilities: Ability[]
   base_experience: number

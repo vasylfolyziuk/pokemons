@@ -16,3 +16,10 @@ export const debounce = (func: Function, wait = 300) => {
   }
   return executedFunction
 }
+
+export const parseUrlId = (url: string) => {
+  return url
+    .split("/")
+    .filter((path) => path)
+    .pop()
+}

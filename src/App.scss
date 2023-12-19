@@ -1,0 +1,21 @@
+$margin: 20px;
+
+.app {
+  margin: $margin 0;
+}
+
+.filter {
+  margin-bottom: $margin;
+
+  .MuiFormControl-root {
+    &.search-input {
+      margin-right: $margin;
+    }
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: $margin;
+}

@@ -1,5 +1,5 @@
 import { Pagination } from "@mui/material"
-import { Pokemon } from "@types"
+import { Pokemon } from "@customTypes/Pokemon"
 import { PokemonsListItem } from "./PokemonListItem"
 
 type Props = {
@@ -25,22 +25,22 @@ export const PokemonsList = (props: Props) => {
               key={pokemon.id}
               id={pokemon.id}
               name={pokemon.name}
-              type={
-                pokemon.types[0].type.name +
-                " " +
-                (pokemon.types[1]?.type.name || "")
-              }
+              type={pokemon.types.map((item) => item.type.name).join(", ")}
             />
           ))}
           {pages > 0 ? (
             <Pagination
+              className="pagination"
               page={page}
               disabled={isLoading}
               count={pages}
               onChange={onChangePage}
             />
           ) : (
-            <div>{searchError || "No pokemons"}</div>
+            <div>
+              {searchError && pokemons.length === 0 && searchError}
+              {!searchError && pokemons.length === 0 && "No pokemons"}
+            </div>
           )}
         </>
       )}

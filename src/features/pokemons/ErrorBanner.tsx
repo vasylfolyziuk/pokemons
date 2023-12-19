@@ -16,7 +16,6 @@ export const ErrorBanner = () => {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={!!error}
-        autoHideDuration={6000}
         onClose={handleClose}
       >
         <Alert severity="error" onClose={handleClose}>
